@@ -82,7 +82,6 @@ const SearchForm = () => {
             </div>
 
             <div className="flex flex-col md:flex-row gap-2 md:gap-5">
-
                 <div className="flex items-center gap-1 cursor-pointer">
                     <input
                         onChange={(e) => setFilter(e.target.value)}
@@ -92,7 +91,6 @@ const SearchForm = () => {
                     <label htmlFor="none">None</label>
                 </div>
 
-
                 <div className="flex items-center gap-1 cursor-pointer">
                     <input
                         onChange={(e) => setFilter(e.target.value)}
@@ -101,6 +99,7 @@ const SearchForm = () => {
                         type="radio" name="filter" id="book-name" />
                     <label htmlFor="book-name">Book Name</label>
                 </div>
+
                 <div className="flex items-center gap-1 cursor-pointer">
                     <input
                         onChange={(e) => setFilter(e.target.value)}

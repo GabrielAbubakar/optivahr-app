@@ -1,6 +1,6 @@
 import { IBookInfo } from "../utils/interface"
 
-const ListBook = ({ book }: { book: IBookInfo }) => {
+const BookCard = ({ book }: { book: IBookInfo }) => {
     return (
         <div
             className="flex gap-5 bg-white p-5 border border-gray-500 border-collapse"
@@ -23,4 +23,4 @@ const ListBook = ({ book }: { book: IBookInfo }) => {
     )
 }
 
-export default ListBook
+export default BookCard
