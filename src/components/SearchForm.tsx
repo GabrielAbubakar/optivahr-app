@@ -17,46 +17,56 @@ const SearchForm = () => {
 
         if (filter == 'book-name') {
             setIsLoading(true)
-
-            const res = await axiosInstance.get(`/books?name=${search}`)
-
-            setBooks(res.data)
-            setIsLoading(false)
+            await axiosInstance.get(`/books?name=${search}`)
+                .then(res => setBooks(res.data))
+                .catch(err => console.log(err))
+                .finally(() => setIsLoading(false))
         }
 
         if (filter == 'character-name') {
-            setIsLoading(true)
-            // Get the character with that name
-            const res = await axiosInstance.get(`/characters?name=${search}`)
-            // Get the links of all books with that character
-            const requests = res.data[0].books.map((url: string) => axios.get(url))
-            // Make an api call with all of the links
-            const responses = await Promise.all(requests)
-            const data = responses.map(res => res.data)
-            // Set the books array to the fetched details
-            setBooks(data)
-            setIsLoading(false)
+            try {
+                setIsLoading(true)
+                // Get the character with that name
+                const res = await axiosInstance.get(`/characters?name=${search}`)
+                // Get the links of all books with that character
+                const requests = res.data[0].books.map((url: string) => axios.get(url))
+                // Make an api call with all of the links
+                const responses = await Promise.all(requests)
+                const data = responses.map(res => res.data)
+
+                // Set the books array to the fetched details
+                setBooks(data)
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setIsLoading(false)
+            }
         }
     }
 
     useEffect(() => {
         async function getFilterNone() {
             if (filter === 'none') {
-                setIsLoading(true)
+                try {
+                    setIsLoading(true)
 
-                const res = await axiosInstance.get(`/books`)
+                    const res = await axiosInstance.get(`/books`)
 
-                const linkHeader = res.headers.link;
-                const links = parseLinkHeader(linkHeader);
+                    const linkHeader = res.headers.link;
+                    const links = parseLinkHeader(linkHeader);
 
-                if (links.next) {
-                    setNextLink(links.next)
-                } else {
-                    setNextLink(false)
+                    if (links.next) {
+                        setNextLink(links.next)
+                    } else {
+                        setNextLink(false)
+                    }
+
+                    setBooks(res.data)
+                } catch (error) {
+                    console.log(error);
+                } finally {
+                    setIsLoading(false)
                 }
-
-                setBooks(res.data)
-                setIsLoading(false)
             }
         }
 
