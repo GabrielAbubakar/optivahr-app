@@ -12,5 +12,15 @@ interface IContext {
     setFilter: React.Dispatch<React.SetStateAction<string>>
 }
 
-export const AppContext = createContext<IContext | null>(null)
+export const AppContext = createContext<IContext>({
+    // Default values for context
+    books: [],
+    filter: '',
+    isLoading: true,
+    search: '',
+    setBooks: () => { },
+    setFilter: () => { },
+    setIsLoading: () => { },
+    setSearch: () => { }
+})
 

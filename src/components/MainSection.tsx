@@ -9,7 +9,10 @@ import LoadingBook from "./LoadingBook"
 
 
 const MainSection = () => {
-    const { books, setBooks, isLoading, setIsLoading } = useContext(AppContext)
+    const { search,
+        filter,
+        isLoading, setIsLoading,
+        setBooks, books } = useContext(AppContext)
 
     useEffect(() => {
         async function getBooks() {
@@ -38,6 +41,20 @@ const MainSection = () => {
             </h1>
 
             <SearchForm />
+
+            <div className="mb-20 text-center underline">
+                {
+                    filter == 'none' ? (
+                        <p>All Categories</p>
+                    ) : filter == 'book-name' ? (
+                        <p>Books with the name "{search}"</p>
+                    ) : filter == 'character-name' ? (
+                        <p>Books with the character name "{search}"</p>
+                    ) : filter == 'character-culture' ? (
+                        <p>Books with the character culture "{search}"</p>
+                    ) : ''
+                }
+            </div>
 
             <div className="flex flex-col flex-wrap lg:w-[70%] mx-auto">
                 {

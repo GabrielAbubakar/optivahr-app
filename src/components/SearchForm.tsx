@@ -1,12 +1,53 @@
-import { useContext } from "react"
+import React, { useContext } from "react"
 import { AppContext } from "../context/AppContext"
+import axiosInstance from "../utils/axiosInstance"
+import axios from "axios"
 
 const SearchForm = () => {
-    const { search, setSearch, filter, setFilter } = useContext(AppContext)
+    const { search, setSearch,
+        filter, setFilter,
+        setIsLoading,
+        setBooks } = useContext(AppContext)
+
+    async function submitForm(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault()
+
+        if (filter == 'book-name') {
+            setIsLoading(true)
+
+            const res = await axiosInstance.get(`/books?name=${search}`)
+
+            setBooks(res.data)
+            setIsLoading(false)
+        }
+
+        if (filter == 'character-name') {
+            setIsLoading(true)
+
+            const res = await axiosInstance.get(`/characters?name=${search}`)
+            const requests = res.data[0].books.map((url: string) => axios.get(url))
+            const responses = await Promise.all(requests)
+            const data = responses.map(res => res.data)
+
+            setBooks(data)
+            setIsLoading(false)
+        }
+
+        if (filter == 'none') {
+            setIsLoading(true)
+
+            const res = await axiosInstance.get(`/books`)
+
+            setBooks(res.data)
+            setIsLoading(false)
+        }
+    }
 
 
     return (
-        <form className="flex flex-col items-center mb-40">
+        <form
+            onSubmit={(e) => submitForm(e)}
+            className="flex flex-col items-center mb-20">
             <div className="flex mb-5">
                 <input
                     required
@@ -48,14 +89,14 @@ const SearchForm = () => {
                         type="radio" name="filter" id="character-name" />
                     <label htmlFor="character-name">Character Name</label>
                 </div>
-                <div className="flex items-center gap-1 cursor-pointer">
+                {/* <div className="flex items-center gap-1 cursor-pointer">
                     <input
                         onChange={(e) => setFilter(e.target.value)}
                         checked={filter === 'character-culture'}
                         value='character-culture'
                         type="radio" name="filter" id="character-culture" />
                     <label htmlFor="character-culture">Character Culture</label>
-                </div>
+                </div> */}
             </div>
         </form>
     )
