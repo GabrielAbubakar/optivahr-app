@@ -1,13 +1,16 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import { AppContext } from "../context/AppContext"
 import axiosInstance from "../utils/axiosInstance"
 import axios from "axios"
+import { parseLinkHeader } from "../utils/parseLinkHeader"
 
 const SearchForm = () => {
     const { search, setSearch,
         filter, setFilter,
         setIsLoading,
-        setBooks } = useContext(AppContext)
+        setBooks,
+        setNextLink
+    } = useContext(AppContext)
 
     async function submitForm(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault()
@@ -23,25 +26,42 @@ const SearchForm = () => {
 
         if (filter == 'character-name') {
             setIsLoading(true)
-
+            // Get the character with that name
             const res = await axiosInstance.get(`/characters?name=${search}`)
+            // Get the links of all books with that character
             const requests = res.data[0].books.map((url: string) => axios.get(url))
+            // Make an api call with all of the links
             const responses = await Promise.all(requests)
             const data = responses.map(res => res.data)
-
+            // Set the books array to the fetched details
             setBooks(data)
             setIsLoading(false)
         }
-
-        if (filter == 'none') {
-            setIsLoading(true)
-
-            const res = await axiosInstance.get(`/books`)
-
-            setBooks(res.data)
-            setIsLoading(false)
-        }
     }
+
+    useEffect(() => {
+        async function getFilterNone() {
+            if (filter === 'none') {
+                setIsLoading(true)
+
+                const res = await axiosInstance.get(`/books`)
+
+                const linkHeader = res.headers.link;
+                const links = parseLinkHeader(linkHeader);
+
+                if (links.next) {
+                    setNextLink(links.next)
+                } else {
+                    setNextLink(false)
+                }
+
+                setBooks(res.data)
+                setIsLoading(false)
+            }
+        }
+
+        getFilterNone()
+    }, [filter, setIsLoading, setBooks, setNextLink])
 
 
     return (

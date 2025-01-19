@@ -1,18 +1,48 @@
 import { useEffect, useContext } from "react"
-import { AppContext } from "../context/AppContext"
+import axios from "axios"
 import axiosInstance from "../utils/axiosInstance"
 import SearchForm from "./SearchForm"
 import ListBook from "./ListBook"
-import { IBookInfo } from "../utils/interface"
 import LoadingBook from "./LoadingBook"
+import { AppContext } from "../context/AppContext"
+import { IBookInfo } from "../utils/interface"
+import { parseLinkHeader } from "../utils/parseLinkHeader"
 
 
 
 const MainSection = () => {
+
     const { search,
         filter,
         isLoading, setIsLoading,
-        setBooks, books } = useContext(AppContext)
+        setBooks, books,
+        nextLink, setNextLink
+    } = useContext(AppContext)
+
+
+    async function fetchMore() {
+        try {
+            setIsLoading(true)
+            const res = await axios.get(nextLink as string)
+            setBooks(res.data)
+
+            const linkHeader = res.headers.link;
+            const links = parseLinkHeader(linkHeader);
+
+            if (links.next) {
+                setNextLink(links.next)
+            } else {
+                setNextLink(false)
+            }
+
+            // console.log(links);
+            // console.log(res.headers.link.split(',')[0]);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false)
+        }
+    }
 
     useEffect(() => {
         async function getBooks() {
@@ -20,8 +50,19 @@ const MainSection = () => {
                 setIsLoading(true)
                 const res = await axiosInstance.get('/books')
                 setBooks(res.data)
+                // Get the pagination links string from linkHeader
+                const linkHeader = res.headers.link;
+                // pass links to a custom parsing function that arranges properties to values in an object
+                const links = parseLinkHeader(linkHeader);
 
-                console.log(res.headers.link.split(',')[0]);
+                if (links.next) {
+                    setNextLink(links.next)
+                } else {
+                    setNextLink(false)
+                }
+
+                // console.log(links);
+                // console.log(res.headers.link.split(',')[0]);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -30,7 +71,7 @@ const MainSection = () => {
         }
 
         getBooks()
-    }, [setBooks, setIsLoading])
+    }, [setBooks, setIsLoading, setNextLink])
 
 
     return (
@@ -62,15 +103,31 @@ const MainSection = () => {
                         <LoadingBook
                             key={item}
                         />
-                    )) : books?.map((book: IBookInfo) => (
+                    )) : books.length !== 0 ? books?.map((book: IBookInfo) => (
                         <ListBook
                             key={book.isbn}
                             book={book}
                         />
-                    ))
+                    )) : books.length == 0 ? (
+                        <p>No books are available</p>
+                    ) : ''
                 }
 
-                <div></div>
+                <div className="mt-20 text-center">
+                    {nextLink ? (
+                        <button
+                            className="bg-blue-600 text-white px-4 py-2 transition-all hover:-translate-y-1 hover:shadow-md active:translate-y-0"
+                            onClick={fetchMore}
+                        >Next Page</button>
+                    ) : (
+                        <button
+                            className="cursor-not-allowed bg-gray-300 text-white px-4 py-2 "
+                            disabled
+                        >No Next Page</button>
+                    )
+
+                    }
+                </div>
             </div>
         </div>
     )

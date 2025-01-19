@@ -1,1 +1,10 @@
 to perform search use: /books?name=A+Game+of+Thrones
+
+
+to perform pagination
+- on initial page load get the pagination links in headers
+- if the links contains a next property, then set nextLink to the link, if it doesnt set nextLink to false
+- as regards UI, if the nextLink variable is truthy, then show a next button
+- once that nextButton is clicked, make a fetch to the api with the value of nextLink
+(what i want to do here is show a loading UI for the incoming data, 3 items loading UI, however such should not remove the already showing books, and also when the data comes in it should be appended to the list of already fetched books)
+- 
