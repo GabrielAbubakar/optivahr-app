@@ -5,6 +5,7 @@ import SearchForm from "./SearchForm"
 import { AppContext } from "../context/AppContext"
 import { parseLinkHeader } from "../utils/parseLinkHeader"
 import NextButton from "./NextButton"
+import PrevButton from "./PrevButton"
 import BookList from "./BookList"
 import CategoryDisplay from "./CategoryDisplay"
 import Header from "./Header"
@@ -17,11 +18,44 @@ const MainSection = () => {
         filter,
         setIsLoading,
         setBooks,
-        nextLink, setNextLink
+        nextLink, setNextLink,
+        prevLink, setPrevLink
     } = useContext(AppContext)
 
 
-    async function fetchMore() {
+    async function fetchPrevBooks() {
+        try {
+            setIsLoading(true)
+            const res = await axios.get(prevLink as string)
+            setBooks(res.data)
+
+            const linkHeader = res.headers.link;
+            const links = parseLinkHeader(linkHeader);
+
+            if (links.next) {
+                setNextLink(links.next)
+            } else {
+                setNextLink(false)
+            }
+
+            if (links.prev) {
+                console.log(links.prev);
+
+                setPrevLink(links.prev)
+            } else {
+                setPrevLink(false)
+            }
+
+            // console.log(links);
+            // console.log(res.headers.link.split(',')[0]);
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    async function fetchNextBooks() {
         try {
             setIsLoading(true)
             const res = await axios.get(nextLink as string)
@@ -34,6 +68,14 @@ const MainSection = () => {
                 setNextLink(links.next)
             } else {
                 setNextLink(false)
+            }
+
+            if (links.prev) {
+                console.log(links.prev);
+
+                setPrevLink(links.prev)
+            } else {
+                setPrevLink(false)
             }
 
             // console.log(links);
@@ -89,7 +131,10 @@ const MainSection = () => {
             {/* Book List */}
             <BookList />
 
-            <NextButton fetchMore={fetchMore} />
+            <div className="mt-20 flex gap-5 justify-center">
+                <PrevButton fetchMore={fetchPrevBooks} />
+                <NextButton fetchMore={fetchNextBooks} />
+            </div>
         </div>
     )
 }

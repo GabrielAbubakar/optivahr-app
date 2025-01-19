@@ -7,11 +7,13 @@ interface IContext {
     isLoading: boolean,
     books: IBookInfo[],
     nextLink: string | false,
+    prevLink: string | false,
     setBooks: React.Dispatch<React.SetStateAction<IBookInfo[]>>,
     setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
     setSearch: React.Dispatch<React.SetStateAction<string>>,
     setFilter: React.Dispatch<React.SetStateAction<string>>,
     setNextLink: React.Dispatch<React.SetStateAction<string | false>>,
+    setPrevLink: React.Dispatch<React.SetStateAction<string | false>>,
 }
 
 export const AppContext = createContext<IContext>({
@@ -21,10 +23,12 @@ export const AppContext = createContext<IContext>({
     isLoading: true,
     search: '',
     nextLink: '',
+    prevLink: '',
     setBooks: () => { },
     setFilter: () => { },
     setIsLoading: () => { },
     setSearch: () => { },
-    setNextLink: () => { }
+    setNextLink: () => { },
+    setPrevLink: () => { }
 })
 

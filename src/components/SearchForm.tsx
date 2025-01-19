@@ -9,7 +9,8 @@ const SearchForm = () => {
         filter, setFilter,
         setIsLoading,
         setBooks,
-        setNextLink
+        setNextLink,
+        setPrevLink
     } = useContext(AppContext)
 
     async function submitForm(e: React.FormEvent<HTMLFormElement>) {
@@ -18,9 +19,15 @@ const SearchForm = () => {
         if (filter == 'book-name') {
             setIsLoading(true)
             await axiosInstance.get(`/books?name=${search}`)
-                .then(res => setBooks(res.data))
+                .then(res => {
+                    setPrevLink(false)
+                    setNextLink(false)
+                    setBooks(res.data)
+                })
                 .catch(err => console.log(err))
                 .finally(() => setIsLoading(false))
+
+
         }
 
         if (filter == 'character-name') {
@@ -33,6 +40,9 @@ const SearchForm = () => {
                 // Make an api call with all of the links
                 const responses = await Promise.all(requests)
                 const data = responses.map(res => res.data)
+
+                setPrevLink(false)
+                setNextLink(false)
 
                 // Set the books array to the fetched details
                 setBooks(data)
@@ -61,6 +71,14 @@ const SearchForm = () => {
                         setNextLink(false)
                     }
 
+                    if (links.prev) {
+                        console.log(links.prev);
+
+                        setPrevLink(links.prev)
+                    } else {
+                        setPrevLink(false)
+                    }
+
                     setBooks(res.data)
                 } catch (error) {
                     console.log(error);
@@ -71,7 +89,7 @@ const SearchForm = () => {
         }
 
         getFilterNone()
-    }, [filter, setIsLoading, setBooks, setNextLink])
+    }, [filter, setIsLoading, setBooks, setNextLink, setPrevLink])
 
 
     return (
