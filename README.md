@@ -19,9 +19,12 @@ npm run dev
 
 4. After executing the command above, navigate to the localhost, [Open Localhost](http://localhost:5173) in order to see the live preview of the application.
 
+
+
+
+
 ## Challenges faced in the application
 In implementing the requirements of the task, I encountered a number of issues with the API that complicated some of the features that were required. Some of those complications include;
 
 - Firstly, the api in its /books route does not provide for a way to query/filter books based on most of the fields asked for (publisher, isbn, authors, end date etc), and only allowed for Quering based on the books name.
-- Also I had some issues with the pagination as the common standard for paginated apis was not used, however I was still able to implement some sort of pagination of the results
-- 
+- Also I had some issues with the pagination as the common standard for paginated apis was not used, however I was still able to implement some sort of pagination of the results.
